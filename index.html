@@ -12,9 +12,8 @@
   --f-d:'Chakra Petch','Arial Narrow',sans-serif; --f-b:'IBM Plex Sans','Segoe UI',sans-serif; --f-m:'IBM Plex Mono',Consolas,monospace;
   color-scheme:dark;
 }
-@media (prefers-color-scheme:light){:root{
-  --bg:#eef3f9; --bg2:#e5ecf5; --panel:#ffffff; --line:#cdd9e8; --line2:#a9bbd2;
-  --fg:#1c2a3d; --mute:#566b87; --head:#0a1626; --accent:#8a5a00; --accent-d:#e3c27d; --agreed:#8a5a00; --rec:#00689a; --warn:#b3261e; --glow:rgba(0,108,148,.08); color-scheme:light}}
+:root[data-theme="light"]{--bg:#eef2f7; --bg2:#e3e9f1; --panel:#ffffff; --line:#cfd8e3; --line2:#9fb0c4; --fg:#1b2735; --mute:#52627a; --head:#0b1420; --accent:#8f6200; --accent-d:#d9b25e; --agreed:#8f6200; --rec:#0a6aa1; --warn:#b3261e; --glow:rgba(10,106,161,.07); color-scheme:light;}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#eef2f7; --bg2:#e3e9f1; --panel:#ffffff; --line:#cfd8e3; --line2:#9fb0c4; --fg:#1b2735; --mute:#52627a; --head:#0b1420; --accent:#8f6200; --accent-d:#d9b25e; --agreed:#8f6200; --rec:#0a6aa1; --warn:#b3261e; --glow:rgba(10,106,161,.07); color-scheme:light;}}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 var(--f-b);padding-inline:16px;
@@ -103,10 +102,11 @@ footer{border-top:1px solid var(--line);padding-top:18px;display:flex;justify-co
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 .brand{display:flex;align-items:center;gap:22px;flex-wrap:wrap}.logo{width:112px;height:112px;border-radius:50%;box-shadow:0 0 0 1px var(--line2),0 0 32px rgba(70,192,245,.35);flex:none}
 .hero{background:radial-gradient(circle at 0 0,rgba(232,176,74,.10),transparent 45%),linear-gradient(135deg,var(--panel),var(--bg2))}
+.tbtn{font:500 11px/1 var(--f-m);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);background:transparent;border:1px solid var(--accent);padding:7px 11px;cursor:pointer}.tbtn:hover,.tbtn:focus-visible{background:var(--accent);color:var(--bg);outline:none}
 </style></head><body>
 <div class="wrap">
 <header class="hero">
-  <div class="top"><span class="tag">Icarus · Training Division</span><span class="tag">Status: awaiting Saturday decision · Oct 24, 12:00 ET</span></div>
+  <div class="top"><span class="tag">Icarus · Training Division</span><span class="tag">Status: awaiting Saturday decision · Oct 24, 12:00 ET</span><button id="themeBtn" class="tbtn" type="button" aria-label="Switch between light and dark mode">Light mode</button></div>
   <div class="brand"><img class="logo" src="https://cdn.discordapp.com/icons/1528965877444116564/959e320f1c9db8c4e61518c5243772d7.png?size=256" alt="Icarus logo" width="112" height="112"><h1>Guild <b>Training</b> Plan</h1></div>
   <p>The finished plan, not a list of options. It keeps everything agreed in the Icarus Admin Chat on Oct 20 and fills each gap with a specific answer, so Saturday is a yes or no vote.</p>
   <div class="legend"><span class="chip a">Agreed: said in the chat</span><span class="chip r">Recommended: my answer</span></div>
@@ -282,4 +282,8 @@ footer{border-top:1px solid var(--line);padding-top:18px;display:flex;justify-co
 
 <footer><span class="tag">Icarus · Guild Training Plan</span><span class="tag">Nothing is built in Discord until the Saturday decision</span></footer>
 </div>
+<script>(function(){var r=document.documentElement,k="icarus-theme";try{var s=localStorage.getItem(k);if(s)r.setAttribute("data-theme",s)}catch(e){}
+function cur(){return r.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme:light)").matches?"light":"dark")}
+var b=document.getElementById("themeBtn");function lab(){b.textContent=cur()==="light"?"Dark mode":"Light mode"}
+b.addEventListener("click",function(){var n=cur()==="light"?"dark":"light";r.setAttribute("data-theme",n);try{localStorage.setItem(k,n)}catch(e){}lab()});lab()})()</script>
 </body></html>
