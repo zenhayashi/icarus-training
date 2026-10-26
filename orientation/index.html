@@ -103,6 +103,381 @@ footer{border-top:1px solid var(--line);padding-top:18px;display:flex;justify-co
 .brand{display:flex;align-items:center;gap:22px;flex-wrap:wrap}.logo{width:112px;height:112px;border-radius:50%;box-shadow:0 0 0 1px var(--line2),0 0 32px rgba(70,192,245,.35);flex:none}
 .hero{background:radial-gradient(circle at 0 0,rgba(232,176,74,.10),transparent 45%),linear-gradient(135deg,var(--panel),var(--bg2))}
 .tbtn{font:500 11px/1 var(--f-m);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);background:transparent;border:1px solid var(--accent);padding:7px 11px;cursor:pointer}.tbtn:hover,.tbtn:focus-visible{background:var(--accent);color:var(--bg);outline:none}
+</style>
+<style>
+/* ---- orientation additions ---- */
+.key{display:inline-block;font:600 .85em var(--f-m);padding:.15em .55em;border:1px solid var(--line2);border-bottom-width:3px;background:var(--bg2);color:var(--head);border-radius:4px;white-space:nowrap}
+.keys{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.flow{display:flex;flex-wrap:wrap;gap:18px;align-items:stretch}
+.flow .st{flex:1 1 170px;background:var(--panel);border:1px solid var(--line);padding:14px 16px;position:relative}
+.flow .st b{display:block;font:600 .62em var(--f-m);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.flow .st+.st::before{content:"\2192";position:absolute;left:-16px;top:50%;transform:translateY(-50%);color:var(--accent);font-size:18px}
+.qs{display:grid;gap:10px}
+.qs div{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--rec);padding:12px 16px}
+.say{color:var(--mute)}
+.slide{margin:0 0 26px}
+.slide+.slide{padding-top:18px;border-top:1px dashed var(--line2)}
+details.notes{border:1px dashed var(--line2);padding:8px 14px;color:var(--mute);font-size:14px;margin-top:14px}
+details.notes summary{cursor:pointer;font:500 11px var(--f-m);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+details.notes ul{margin:8px 0 0;padding-left:18px}
+.pbtn{font:600 12px/1 var(--f-m);letter-spacing:.12em;text-transform:uppercase;color:var(--bg);background:var(--accent);border:1px solid var(--accent);padding:8px 14px;cursor:pointer;margin-right:6px}
+.pbtn:hover,.pbtn:focus-visible{background:transparent;color:var(--accent);outline:none}
+#pbar,#pdots{display:none}
+/* ---- present mode ---- */
+body.present{overflow:hidden}
+body.present .wrap{max-width:none;padding:0;margin:0}
+body.present .hero,body.present nav,body.present footer,body.present .host,body.present .chip,body.present details.notes,body.present .code,body.present .readonly,body.present .legend{display:none!important}
+body.present section{display:block;margin:0;padding:0;border:0}
+body.present section .body{display:block;padding:0;margin:0;border:0}
+body.present .slide{display:none;height:100vh;box-sizing:border-box;padding:calc(56px + 4vh) 7vw 9vh;overflow:auto;align-content:center;margin:0;border:0;font-size:clamp(19px,2.4vw,34px);line-height:1.45}
+body.present .slide.on{display:grid}
+body.present .slide>*{margin-top:0;margin-bottom:0}
+body.present .slide>*+*{margin-top:2.4vh}
+body.present .slide h2{font-size:clamp(34px,5.4vw,76px);line-height:1.05;margin-bottom:0}
+body.present .slide h3{font-size:.8em}
+body.present .lead{font-size:1em;max-width:none}
+body.present .panel{padding:2.2vh 2.4vw}
+body.present ul.sq{gap:1.4vh}
+body.present .pairs{font-size:.85em}
+body.present .dec{font-size:.95em}
+body.present #pbar{display:flex;position:fixed;left:0;right:0;top:0;z-index:20;align-items:center;gap:18px;padding:10px 18px;background:var(--bg2);border-bottom:1px solid var(--line2);font:500 13px var(--f-m);color:var(--mute)}
+body.present #pbar b{color:var(--accent);font-weight:600}
+body.present #pbar .sp{flex:1}
+body.present #pbar button{font:500 11px var(--f-m);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);background:transparent;border:1px solid var(--accent);padding:6px 10px;cursor:pointer}
+body.present #pbar button:hover,body.present #pbar button:focus-visible{background:var(--accent);color:var(--bg);outline:none}
+body.present #ptime.over{color:var(--warn)}
+body.present #pdots{display:block;position:fixed;left:0;right:0;bottom:0;height:6px;background:var(--line);z-index:20}
+body.present #pfill{height:100%;background:var(--accent);width:0;transition:width .25s}
+body.present .title-slide h1{font-size:clamp(40px,8vw,110px);text-transform:uppercase;line-height:1;font-family:var(--f-d);color:var(--head);margin:0}
+body.present .title-slide h1 b{color:var(--accent)}
+.title-slide h1{margin:6px 0 10px}
+@media print{#pbar,#pdots,.pbtn,.tbtn{display:none}}
+@media(max-width:700px){.flow .st+.st::before{display:none}.flow{gap:10px}}
+</style>
+</head>
+<body>
+<div id="pbar"><span><b id="pn">1</b> / <span id="pt">1</span></span><span id="plabel"></span><span class="sp"></span><span>Time <b id="ptime">0:00</b> / 10:00</span><span id="pbudget"></span><button id="pnext" type="button">Next</button><button id="pexit" type="button">Exit</button></div>
+<div id="pdots"><div id="pfill"></div></div>
+<div class="wrap">
+<header class="hero">
+  <div class="top"><span class="tag">Icarus &middot; New Member Orientation</span><span class="tag">Status: draft for Taz &middot; date to be announced</span><span><button id="presentBtn" class="pbtn" type="button">Present</button><button id="themeBtn" class="tbtn" type="button" aria-label="Switch between light and dark mode">Light mode</button></span></div>
+  <div class="brand"><img class="logo" src="https://cdn.discordapp.com/icons/1528965877444116564/959e320f1c9db8c4e61518c5243772d7.png?size=256" alt="Icarus logo" width="112" height="112"><h1>New Member <b>Orientation</b></h1></div>
+  <p>A short voice session for everyone who joins Icarus: who we are, how to use H.E.L.I.O.S. and its app, what we use Fleetyards for, and how work orders and dispatch work. Ten minutes at most. Built from what Taz and Fenfast agreed in the admin chat; Taz decides the final content and the date. Press <b>Present</b> to show it as slides on a shared screen.</p>
+  <div class="legend"><span class="chip a">Agreed: said in the admin chat</span><span class="chip r">Added: how things work today</span></div>
+  <div class="stats">
+    <div><strong>10 min</strong><span>at most, in voice chat</span></div>
+    <div><strong>13</strong><span>short slides, about 9 minutes plus questions</span></div>
+    <div><strong>8</strong><span>guilds planned as we grow</span></div>
+    <div><strong>TBA</strong><span>official date, set by Taz</span></div>
+  </div>
+</header>
+
+<nav aria-label="Sections"><a href="#s1">Welcome</a><a href="#s2">Who we are</a><a href="#s3">H.E.L.I.O.S.</a><a href="#s4">The app</a><a href="#s5">Fleetyards</a><a href="#s6">Work orders and dispatch</a><a href="#s7">Where we're heading</a><a href="#s8">Your first steps</a><a href="#s9">Questions</a><a href="#s10">Open items</a></nav>
+
+<section id="s1"><div class="code">SEC 01<i>01</i></div><div class="body">
+<article class="slide " data-label="Welcome" data-t="20">
+<div class="title-slide"><p class="tag">Icarus &middot; New Member Orientation</p><h1>Welcome to <b>Icarus</b></h1></div>
+  <p class="lead">Ten minutes. Five things worth knowing, then your questions.</p>
+  <div class="qs"><div>1 &nbsp; Who we are</div><div>2 &nbsp; H.E.L.I.O.S. and its app</div><div>3 &nbsp; Fleetyards</div><div>4 &nbsp; Work orders and dispatch</div><div>5 &nbsp; Where we are heading</div></div>
+  <div class="host"><p class="lead">A quick talk in voice chat, led by Taz: <b>10 minutes at most</b> <span class="chip a">Agreed</span>. Taz can do it as voice chat alone, voice chat then partied up in game, or a few slides in voice chat <span class="chip a">Agreed</span>. Run it monthly, or when a few new members are waiting <span class="chip r">Added</span>. The <b>Present</b> button turns this page into slides for a screen share.</p></div><details class="notes"><summary>Talking points</summary><ul><li>Say hello and thank people for joining.</li><li>This is short on purpose: the rest you learn by playing with us.</li><li>Questions are welcome at the end, or in voice any time.</li></ul></details>
+</article>
+</div></section>
+
+<section id="s2"><div class="code">SEC 02<i>02</i></div><div class="body">
+<article class="slide " data-label="Who we are" data-t="60">
+<h2>Who we are</h2>
+  <p class="lead host">Taz's words, exactly as he wrote them in the admin chat. <span class="chip a">Agreed</span></p>
+  <div class="panel"><p>Icarus was created to bring together like-minded players who share a love for Star Citizen and a passion for sharing knowledge. We believe in teaching one another, supporting new players, and learning together across every game loop. Icarus more than an organization, Icarus is a community built on trust, teamwork, and reliability, where every member has something to contribute. We show up for each other, build lasting friendships, and help shape the verse together.</p></div><details class="notes"><summary>Talking points</summary><ul><li>Read it, or say it in your own words.</li><li>Stress the three words: <b>trust, teamwork, reliability</b>.</li><li>Everyone has something to contribute, new players included.</li></ul></details>
+</article>
+</div></section>
+
+<section id="s3"><div class="code">SEC 03<i>03</i></div><div class="body">
+<article class="slide " data-label="H.E.L.I.O.S.: what it does" data-t="50">
+<h2>H.E.L.I.O.S.</h2>
+  <p class="lead">Our assistant, made for Icarus by Fenfast. Free for every member. Ask it in plain English. <span class="chip a">Agreed</span></p>
+  <div class="panel"><h3>What it does for us <span class="chip r">Added</span></h3><ul class="sq">
+    <li><b>Trade:</b> best hauls for your ship, round trips that never fly empty, where to sell</li>
+    <li><b>Mining and salvage:</b> where to mine, which laser and modules, salvage gear</li>
+    <li><b>Ships and gear:</b> stats, loadouts, where to buy, ship against ship</li>
+    <li><b>Our org:</b> who has which ship, work orders, reminders, group finder, polls</li>
+    <li><b>Patches:</b> what changed in the latest update</li></ul></div><details class="notes"><summary>Talking points</summary><ul><li>Prices come from UEX, reported by players, so they can be a little old.</li><li>Everything else is read from the game's own files.</li><li>It never messages you first: a person from the org says hello.</li></ul></details>
+</article>
+<article class="slide " data-label="H.E.L.I.O.S.: how to use it" data-t="50">
+<h2>How to use it</h2>
+  <div class="panel"><ul class="sq">
+    <li>Go to <b>#helios-chat</b> and start with <b>"Helios, ..."</b></li>
+    <li>Type <b>/</b> to see its commands, or <b>/commands</b> for every one with an example</li>
+    <li>Stuck? <b>#how-to-use-helios</b> explains it</li>
+    <li>Something wrong or missing? <b>#helios-feedback</b>, or tag Taz or Fenfast</li></ul></div>
+  <div class="panel"><h3>Try these <span class="chip r">Added</span></h3><div class="qs">
+    <div>"Helios, what is the best haul for 96 SCU?"</div><div>"Helios, where do I buy the RSI Aurora Mk II?"</div><div>"Helios, where is the best place to mine Aluminum?"</div></div></div><details class="notes"><summary>Talking points</summary><ul><li><b>We want you to break it.</b> Every problem found gets fixed.</li><li>Ask like you would ask a person: no special wording needed.</li></ul></details>
+</article>
+</div></section>
+
+<section id="s4"><div class="code">SEC 04<i>04</i></div><div class="body">
+<article class="slide " data-label="The app: when you get it" data-t="50">
+<h2>The H.E.L.I.O.S. app</h2>
+  <p class="lead">A companion app for Windows that puts H.E.L.I.O.S. on your screen while you play. <span class="chip a">Agreed: it comes later, at a higher rank</span></p>
+  <div class="flow">
+    <div class="st"><b>Month one: Initiate</b>The app is not open yet. H.E.L.I.O.S. in the server answers the same questions.</div>
+    <div class="st"><b>A month in: Member</b>The app opens. Say <b>"Helios, I need a setup code"</b> in #helios-chat.</div>
+    <div class="st"><b>Then</b>The admins approve it and H.E.L.I.O.S. sends you the code in a direct message.</div>
+    <div class="st"><b>Install</b>Enter the code, choose a password. The app updates itself.</div></div>
+  <span class="chip r">Added</span><details class="notes"><summary>Talking points</summary><ul><li>It opens at the <b>Member</b> rank, about a month after joining.</li><li>Nothing to do until then: ask in the server.</li><li>Windows only.</li></ul></details>
+</article>
+<article class="slide " data-label="The app: what you get" data-t="40">
+<h2>What the app gives you</h2>
+  <div class="panel"><ul class="sq">
+    <li>A small <b>orb</b> that opens a heads-up display over the game: trade routes, mining, patch news, the org inventory, a marketplace, and chat</li>
+    <li><b>Talk to it:</b> <span class="key">Alt</span> <span class="key">Shift</span> <span class="key">H</span>, ask out loud, and it answers out loud</li>
+    <li><b>Look at my screen:</b> <span class="key">Alt</span> <span class="key">Shift</span> <span class="key">V</span> sends one picture of your game with your question</li>
+    <li><b>Log items for the org:</b> <span class="key">Alt</span> <span class="key">Shift</span> <span class="key">F8</span> starts the hover log, then point at items</li></ul></div>
+  <p class="say">Everything runs only when you press something. Screenshots are not kept, and your wallet only ever shows in an org total, never under your name. <span class="chip r">Added</span></p><details class="notes"><summary>Talking points</summary><ul><li>The hotkeys are meant to work from inside the game.</li><li>Everything in the app is optional.</li><li>Ships come from Fleetyards, so nothing is entered twice.</li></ul></details>
+</article>
+</div></section>
+
+<section id="s5"><div class="code">SEC 05<i>05</i></div><div class="body">
+<article class="slide " data-label="Fleetyards: what and how" data-t="50">
+<h2>Fleetyards</h2>
+  <p class="lead">For now we use it for <b>scheduling events and recording our fleet stats</b>, until org play lets us share ships and log out in each other's ships. <span class="chip a">Agreed: Taz</span></p>
+  <div class="flow">
+    <div class="st"><b>1 Join</b>Our fleet: <b>fltyrd.net/fi/2b800940</b></div>
+    <div class="st"><b>2 Add ships</b>In My Hangar, and sync your RSI hangar</div>
+    <div class="st"><b>3 Verify</b>Press <b>Verify with Fleetyards</b> on your welcome message</div>
+    <div class="st"><b>4 Done</b>H.E.L.I.O.S. reads our fleet from there: enter things once</div></div>
+  <span class="chip r">Added</span><details class="notes"><summary>Talking points</summary><ul><li>The Verify button also gets ticked for you when your Fleetyards name matches your Discord name.</li><li>This is how H.E.L.I.O.S. can tell you who has a Perseus.</li></ul></details>
+</article>
+<article class="slide " data-label="Fleetyards: more it can do" data-t="30">
+<h2>What else it can do for us</h2>
+  <p class="lead host">Taz asked to add what he has not seen yet. <span class="chip a">Agreed</span></p>
+  <div class="pairs">
+    <div><strong>Events and calendar</strong>slots, teams, sign-ups, reminders</div>
+    <div><strong>Roster and hangars</strong>who is in, which ships we own, fleet stats</div>
+    <div><strong>Logistics</strong>the items the org holds, with stock</div>
+    <div><strong>Contracts</strong>jobs with a crew and payouts</div>
+    <div><strong>Squadrons and roles</strong>for when we grow</div>
+    <div><strong>Blueprints and invites</strong>shared with the fleet</div></div>
+  <p class="say">H.E.L.I.O.S. can read all of this today. Writing to Fleetyards, creating events and contracts for us, starts once Fleetyards approves our app.</p><details class="notes"><summary>Talking points</summary><ul><li>Contracts line up with our work orders, which is why the two will join up later.</li></ul></details>
+</article>
+</div></section>
+
+<section id="s6"><div class="code">SEC 06<i>06</i></div><div class="body">
+<article class="slide " data-label="Work orders" data-t="50">
+<h2>Work orders</h2>
+  <p class="lead">For now we run them with <b>H.E.L.I.O.S.</b>: it is simpler while we grow and learn. Once it works with Fleetyards we will pick one standard. <span class="chip a">Agreed: Taz and Fenfast</span></p>
+  <div class="flow">
+    <div class="st"><b>Ask</b><span class="key">/request</span> something from a team</div>
+    <div class="st"><b>Approve</b>An admin approves it and sets a time</div>
+    <div class="st"><b>Accept</b>Press Accept on the card in <b>#work-orders</b></div>
+    <div class="st"><b>Complete</b>Press Complete when it is done</div></div>
+  <p class="say">Want a job to take? <span class="key">/workorder list</span> shows what is open. <span class="chip r">Added</span></p><details class="notes"><summary>Talking points</summary><ul><li>A work order is a job for the crew, shown as a card.</li><li>Anyone can request. Admins approve.</li></ul></details>
+</article>
+<article class="slide " data-label="Dispatch" data-t="30">
+<h2>Dispatch</h2>
+  <div class="panel"><ul class="sq">
+    <li>An admin sends a job straight to the crew with <span class="key">/dispatch</span></li>
+    <li>They say what it is, which team, who it is for if anyone, when it is due, and how urgent: <b>routine, priority or urgent</b></li>
+    <li>Dispatches and completions are logged in <b>#work-dispatch</b> so everyone can see what is going on</li></ul></div>
+  <span class="chip r">Added</span><details class="notes"><summary>Talking points</summary><ul><li>Request is you asking. Dispatch is the org asking you.</li></ul></details>
+</article>
+</div></section>
+
+<section id="s7"><div class="code">SEC 07<i>07</i></div><div class="body">
+<article class="slide " data-label="Where we are heading" data-t="50">
+<h2>Where we are heading</h2>
+  <p class="lead">Today the work runs through work orders and dispatch. As we grow it becomes <b>guilds</b> with classes and instructors. This is the Guild Training Plan, summarized: a proposal the admins are still deciding on, and nothing opens until we have grown enough.</p>
+  <div class="pairs"><div><strong>Medical</strong>first, for everyone</div><div><strong>Miners</strong></div><div><strong>Salvagers</strong></div><div><strong>Haulers</strong></div><div><strong>Combat</strong></div><div><strong>Crafters</strong></div><div><strong>Engineers</strong></div><div><strong>Refuelers</strong></div></div>
+  <div class="panel"><ul class="sq">
+    <li>You pick <b>one main guild and up to two sub guilds</b></li>
+    <li>Classes are <b>short and hands-on</b>: 45 to 60 minutes, nobody only watches</li>
+    <li>The path: <b>Orientation, Basic class, Advanced class, Instructor, Leader</b>. Anyone can stop at any step</li></ul></div><details class="notes"><summary>Talking points</summary><ul><li>Eight guilds are planned. Medical goes first and everyone takes its basic class.</li><li>Every guild gets two trained instructors so no class depends on one person.</li><li>The full plan is on the Guild Training Plan page: <a href='https://zenhayashi.github.io/icarus-training/' style='color:var(--rec)'>zenhayashi.github.io/icarus-training</a>.</li><li>This is a proposal: do not promise dates.</li></ul></details>
+</article>
+</div></section>
+
+<section id="s8"><div class="code">SEC 08<i>08</i></div><div class="body">
+<article class="slide " data-label="Your first steps" data-t="40">
+<h2>Your first steps</h2>
+  <p class="lead">Your welcome message in the server ticks each one off as you go.</p>
+  <ol class="dec">
+    <li><div><b>Accept the rules.</b> Press <b>I agree to the rules</b>.</div></li>
+    <li><div><b>Introduce yourself.</b> Press the <b>Introduce yourself</b> button.</div></li>
+    <li><div><b>Apply to our RSI org (ICLS)</b>, then press <b>I've applied</b>.</div></li>
+    <li><div><b>Join our Fleetyards fleet</b> and add your ships.</div></li>
+    <li><div><b>Say hello to H.E.L.I.O.S.</b> in #helios-chat.</div></li>
+    <li><div><b>A month in, ask for the app:</b> "Helios, I need a setup code".</div></li></ol>
+  <span class="chip r">Added</span><details class="notes"><summary>Talking points</summary><ul><li>Hop into voice chat any time: someone will gladly party up.</li></ul></details>
+</article>
+</div></section>
+
+<section id="s9"><div class="code">SEC 09<i>09</i></div><div class="body">
+<article class="slide " data-label="Questions" data-t="20">
+<h2>Questions?</h2>
+  <div class="panel"><ul class="sq">
+    <li>Anything about Icarus: ask here, or tag <b>Taz</b> or <b>Fenfast</b></li>
+    <li>Anything about H.E.L.I.O.S.: ask it, or post in <b>#helios-feedback</b></li>
+    <li>Hop in voice chat any time: someone will gladly party up</li></ul></div>
+  <p class="say">Welcome aboard.</p><details class="notes"><summary>Talking points</summary><ul><li>Stay on for questions as long as people have them.</li></ul></details>
+</article>
+</div></section>
+
+
+<section id="s10" class="readonly"><div class="code">HOST<i>10</i></div><div class="body">
+  <h2>Open items for Taz</h2>
+  <p class="lead">Taz decides these. Nothing here is final until he says so. This part is not shown in Present mode.</p>
+  <ol class="dec">
+    <li><div><b>Date and time.</b> The earlier event was removed because it was Bjorn's. Taz will set an official date.<em>Open</em></div></li>
+    <li><div><b>Format.</b> Voice chat alone, voice chat then partied up in game, or a few slides in voice chat.<em>Recommended: use Present mode on a shared screen in voice chat, then party up for anyone who wants to.</em></div></li>
+    <li><div><b>Content.</b> Does anything here need to come out, or go in? The parts are what Taz listed, plus the app and a short look ahead at guilds.<em>Open</em></div></li>
+    <li><div><b>Work orders and dispatch.</b> Run with H.E.L.I.O.S. for now, and set one standard once it works with Fleetyards.<em>Agreed</em></div></li>
+    <li><div><b>App access.</b> The app opens at Member rank, a month after joining. Is that still the rule?<em>Open</em></div></li>
+    <li><div><b>Guilds.</b> When they open depends on how much we grow, and the training plan is still a proposal.<em>Open</em></div></li>
+  </ol>
+  <div class="panel"><h3>Using Present mode</h3><div class="keys"><span class="key">P</span> start or stop &nbsp; <span class="key">&rarr;</span> or <span class="key">Space</span> next &nbsp; <span class="key">&larr;</span> back &nbsp; <span class="key">T</span> restart timer &nbsp; <span class="key">F</span> full screen &nbsp; <span class="key">Esc</span> leave</div>
+  <p class="say" style="margin-top:8px">The top bar shows the time budget for each slide. The timer starts when you move to the second slide and counts toward 10:00.</p></div>
+</div></section>
+
+<footer><span class="tag">Icarus &middot; New Member Orientation</span><span class="tag">Draft. Taz sets the date and the final content.</span></footer>
+</div>
+<script>(function(){var r=document.documentElement,k="icarus-theme";try{var s=localStorage.getItem(k);if(s)r.setAttribute("data-theme",s)}catch(e){}
+function cur(){return r.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme:light)").matches?"light":"dark")}
+var b=document.getElementById("themeBtn");function lab(){b.textContent=cur()==="light"?"Dark mode":"Light mode"}
+b.addEventListener("click",function(){var n=cur()==="light"?"dark":"light";r.setAttribute("data-theme",n);try{localStorage.setItem(k,n)}catch(e){}lab()});lab()})()</script>
+<script>(function(){
+var body=document.body,slides=[].slice.call(document.querySelectorAll('.slide')),i=0,start=null,tick=null,BUDGET=600;
+var el=function(id){return document.getElementById(id)};
+function fmt(s){s=Math.max(0,Math.floor(s));return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2)}
+function elapsed(){return start?(Date.now()-start)/1000:0}
+function cum(n){var t=0;for(var k=0;k<n;k++)t+=+slides[k].dataset.t;return t}
+function paint(){var t=elapsed();var e=el('ptime');e.textContent=fmt(t);e.classList.toggle('over',t>BUDGET)}
+function show(n){i=Math.min(slides.length-1,Math.max(0,n));slides.forEach(function(s,k){s.classList.toggle('on',k===i)});
+  el('pn').textContent=i+1;el('pt').textContent=slides.length;el('plabel').textContent=slides[i].dataset.label;
+  el('pbudget').textContent='plan: '+fmt(cum(i+1))+' by the end of this slide';
+  el('pfill').style.width=((i+1)/slides.length*100)+'%';
+  if(i>=1&&!start){start=Date.now()}
+  paint()}
+function on(){body.classList.add('present');el('presentBtn').textContent='Exit';start=null;show(0);tick=setInterval(paint,500);window.scrollTo(0,0)}
+function off(){body.classList.remove('present');el('presentBtn').textContent='Present';clearInterval(tick);start=null;if(document.fullscreenElement)document.exitFullscreen()}
+function toggle(){body.classList.contains('present')?off():on()}
+el('presentBtn').addEventListener('click',toggle);el('pexit').addEventListener('click',off);el('pnext').addEventListener('click',function(e){e.stopPropagation();show(i+1)});
+document.addEventListener('keydown',function(e){
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  var k=e.key;
+  if(!body.classList.contains('present')){if(k==='p'||k==='P'){on();e.preventDefault()}return}
+  if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='Enter'){show(i+1);e.preventDefault()}
+  else if(k==='ArrowLeft'||k==='PageUp'||k==='Backspace'){show(i-1);e.preventDefault()}
+  else if(k==='Home'){show(0)}else if(k==='End'){show(slides.length-1)}
+  else if(k==='Escape'||k==='p'||k==='P'){off()}
+  else if(k==='t'||k==='T'){start=Date.now();paint()}
+  else if(k==='f'||k==='F'){if(document.fullscreenElement)document.exitFullscreen();else if(document.documentElement.requestFullscreen)document.documentElement.requestFullscreen()}
+});
+document.addEventListener('click',function(e){if(body.classList.contains('present')&&!e.target.closest('#pbar,a,button')){show(i+1)}});
+})();</script>
+</body></html>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Icarus New Member Orientation</title>
+<link rel="icon" href="https://cdn.discordapp.com/icons/1528965877444116564/959e320f1c9db8c4e61518c5243772d7.png?size=64">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#04070c; --bg2:#080d15; --panel:#0b121c; --line:#1c2836; --line2:#34445a;
+  --fg:#d9e2ee; --mute:#8b9bb0; --head:#fff4dc;
+  --accent:#e8b04a; --accent-d:#8a6420; --agreed:#e8b04a; --rec:#46c0f5; --warn:#ff7a6b;
+  --glow:rgba(70,192,245,.09);
+  --f-d:'Chakra Petch','Arial Narrow',sans-serif; --f-b:'IBM Plex Sans','Segoe UI',sans-serif; --f-m:'IBM Plex Mono',Consolas,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{--bg:#eef2f7; --bg2:#e3e9f1; --panel:#ffffff; --line:#cfd8e3; --line2:#9fb0c4; --fg:#1b2735; --mute:#52627a; --head:#0b1420; --accent:#8f6200; --accent-d:#d9b25e; --agreed:#8f6200; --rec:#0a6aa1; --warn:#b3261e; --glow:rgba(10,106,161,.07); color-scheme:light;}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#eef2f7; --bg2:#e3e9f1; --panel:#ffffff; --line:#cfd8e3; --line2:#9fb0c4; --fg:#1b2735; --mute:#52627a; --head:#0b1420; --accent:#8f6200; --accent-d:#d9b25e; --agreed:#8f6200; --rec:#0a6aa1; --warn:#b3261e; --glow:rgba(10,106,161,.07); color-scheme:light;}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 var(--f-b);padding-inline:16px;
+  background-image:linear-gradient(var(--glow) 1px,transparent 1px),linear-gradient(90deg,var(--glow) 1px,transparent 1px);background-size:48px 48px;background-attachment:fixed}
+.wrap{max-width:1080px;margin:0 auto;padding-block:32px 72px}
+h1,h2,h3{font-family:var(--f-d);color:var(--head);text-wrap:balance;margin:0}
+.tag{font:500 11px/1 var(--f-m);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.hero{border:1px solid var(--line2);background:linear-gradient(135deg,var(--panel),var(--bg2));padding:28px;position:relative;margin-bottom:24px;
+  clip-path:polygon(0 0,calc(100% - 28px) 0,100% 28px,100% 100%,28px 100%,0 calc(100% - 28px))}
+.hero .top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.hero h1{font-size:clamp(30px,6vw,54px);line-height:1.02;letter-spacing:.01em;text-transform:uppercase;font-weight:700}
+.hero h1 b{color:var(--accent);font-weight:700}
+.hero p{max-width:62ch;margin:16px 0 0;color:var(--fg)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:20px}
+.chip{display:inline-flex;align-items:center;gap:7px;font:500 11px/1 var(--f-m);letter-spacing:.1em;text-transform:uppercase;padding:6px 9px;border:1px solid currentColor}
+.chip.a{color:var(--agreed)} .chip.r{color:var(--rec)}
+.chip::before{content:"";width:6px;height:6px;background:currentColor}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:24px}
+.stats div{background:var(--panel);padding:14px 16px}
+.stats strong{display:block;font:600 28px/1.1 var(--f-d);color:var(--accent)}
+.stats span{font-size:12.5px;color:var(--mute)}
+nav{position:sticky;top:0;z-index:5;background:var(--bg);border-block:1px solid var(--line);margin-bottom:28px;overflow-x:auto;white-space:nowrap}
+nav a{display:inline-block;padding:11px 14px;font:500 11px/1 var(--f-m);letter-spacing:.1em;text-transform:uppercase;color:var(--mute);text-decoration:none;border-bottom:2px solid transparent}
+nav a:hover,nav a:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+section{display:grid;grid-template-columns:96px minmax(0,1fr);gap:0 24px;margin-bottom:44px;scroll-margin-top:60px}
+.code{font:500 12px/1 var(--f-m);color:var(--accent);letter-spacing:.14em;padding-top:10px;border-top:2px solid var(--accent)}
+.code i{display:block;font:600 40px/1 var(--f-d);color:var(--line2);font-style:normal;margin-top:10px}
+section h2{font-size:clamp(22px,3.4vw,32px);text-transform:uppercase;letter-spacing:.02em;margin-bottom:6px}
+.lead{color:var(--mute);margin:0 0 18px;max-width:68ch}
+.body>*+*{margin-top:16px}
+p{margin:0}
+ul.sq{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+ul.sq li{padding-left:22px;position:relative}
+ul.sq li::before{content:"";position:absolute;left:2px;top:.62em;width:7px;height:7px;border:1px solid var(--accent)}
+.panel{background:var(--panel);border:1px solid var(--line);padding:18px 20px}
+.panel h3{font-size:16px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+b,strong{color:var(--head);font-weight:600}
+.ladder{display:grid;gap:10px}
+.rung{display:grid;grid-template-columns:44px minmax(0,1fr);border:1px solid var(--line);background:var(--panel);position:relative}
+.rung:nth-child(2){margin-left:3%}.rung:nth-child(3){margin-left:6%}.rung:nth-child(4){margin-left:9%}.rung:nth-child(5){margin-left:12%}
+.rung .n{display:grid;place-items:center;background:var(--bg2);border-right:1px solid var(--line);font:600 20px var(--f-d);color:var(--accent)}
+.rung .c{padding:14px 18px;display:grid;gap:4px}
+.rung h3{font-size:17px;text-transform:uppercase;letter-spacing:.05em}
+.rung .meta{display:flex;flex-wrap:wrap;gap:6px 18px;font:400 12.5px var(--f-m);color:var(--mute)}
+.rung .meta b{color:var(--accent);font-weight:500}
+.rung.new{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent-d),0 0 24px var(--glow)}
+.rung.new::after{content:"NEW";position:absolute;right:12px;top:10px;font:600 10px var(--f-m);letter-spacing:.16em;color:var(--bg);background:var(--accent);padding:3px 6px}
+.bar{display:flex;height:54px;border:1px solid var(--line2);margin:6px 0 8px}
+.bar div{display:grid;place-items:center;font:500 11px/1.2 var(--f-m);text-align:center;letter-spacing:.06em;text-transform:uppercase;border-right:1px solid var(--bg);padding:2px;min-width:0}
+.bar div:nth-child(1){background:#16324a;color:#bfe9ff}.bar div:nth-child(2){background:#1a4a6b;color:#e3f6ff}.bar div:nth-child(3){background:#1f7396;color:#fff}.bar div:nth-child(4){background:#e8b04a;color:#1a1204}.bar div:nth-child(5){background:#2b3a52;color:#d7e2f0}
+.barnote{display:flex;justify-content:space-between;font:12px var(--f-m);color:var(--mute)}
+.tw{overflow-x:auto;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+th{font:500 11px/1.2 var(--f-m);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);text-align:left;background:var(--bg2);padding:11px 14px;border-bottom:1px solid var(--line2)}
+td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top;background:var(--panel)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-family:var(--f-d);font-weight:600;color:var(--head);white-space:nowrap}
+.num{font-family:var(--f-m);font-variant-numeric:tabular-nums;color:var(--accent)}
+.sched{display:grid;gap:0;border-left:2px solid var(--line2);margin-left:6px}
+.step{display:grid;grid-template-columns:84px minmax(0,1fr);gap:16px;padding:10px 0 10px 18px;position:relative}
+.step::before{content:"";position:absolute;left:-7px;top:18px;width:12px;height:12px;background:var(--bg);border:2px solid var(--accent);transform:rotate(45deg)}
+.step .w{font:500 12px/1.4 var(--f-m);color:var(--accent);letter-spacing:.06em}
+.step p+p{color:var(--mute);font-size:13.5px}
+.guilds{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.g{background:var(--panel);border:1px solid var(--line);padding:16px;display:grid;gap:9px;align-content:start}
+.g h3{font-size:17px;text-transform:uppercase;letter-spacing:.05em;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.g h3 span{font:500 10px var(--f-m);color:var(--mute);letter-spacing:.12em}
+.g dl{margin:0;display:grid;gap:8px}.g dt{font:500 10.5px var(--f-m);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}.g dd{margin:2px 0 0;font-size:13.5px}
+.pairs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.pairs div{border:1px dashed var(--line2);padding:12px 14px;font-size:13.5px}
+.pairs strong{font-family:var(--f-d);display:block;margin-bottom:2px;text-transform:uppercase;letter-spacing:.05em}
+.dec{list-style:none;padding:0;margin:0;display:grid;gap:8px;counter-reset:d}
+.dec li{counter-increment:d;display:grid;grid-template-columns:40px minmax(0,1fr);background:var(--panel);border:1px solid var(--line)}
+.dec li::before{content:counter(d,decimal-leading-zero);display:grid;place-items:center;background:var(--bg2);border-right:1px solid var(--line);font:600 14px var(--f-m);color:var(--accent)}
+.dec li div{padding:12px 16px}
+.dec em{display:block;font-style:normal;margin-top:4px;font:500 12.5px var(--f-m);color:var(--rec)}
+.warn{border-left:3px solid var(--warn);padding:10px 14px;background:var(--panel);font-size:14px}
+footer{border-top:1px solid var(--line);padding-top:18px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media (max-width:760px){
+  section{grid-template-columns:minmax(0,1fr)}
+  .code{display:flex;gap:12px;align-items:baseline;margin-bottom:12px;width:100%}.code i{margin:0;font-size:24px}
+  .rung:nth-child(n){margin-left:0}
+  .step{grid-template-columns:minmax(0,1fr);gap:2px}
+  .hero{padding:20px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.brand{display:flex;align-items:center;gap:22px;flex-wrap:wrap}.logo{width:112px;height:112px;border-radius:50%;box-shadow:0 0 0 1px var(--line2),0 0 32px rgba(70,192,245,.35);flex:none}
+.hero{background:radial-gradient(circle at 0 0,rgba(232,176,74,.10),transparent 45%),linear-gradient(135deg,var(--panel),var(--bg2))}
+.tbtn{font:500 11px/1 var(--f-m);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);background:transparent;border:1px solid var(--accent);padding:7px 11px;cursor:pointer}.tbtn:hover,.tbtn:focus-visible{background:var(--accent);color:var(--bg);outline:none}
 </style></head>
 <body>
 <div class="wrap">
